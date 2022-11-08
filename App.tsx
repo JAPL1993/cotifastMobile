@@ -1,29 +1,64 @@
-import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { NativeBaseProvider, Box, Text, FlatList, Heading, HStack, VStack, Avatar, Spacer } from "native-base";
 import 'react-native-gesture-handler';
-import { Canvas, Fill, Box, BoxShadow, rrect, rect } from "@shopify/react-native-skia";
 import { colorSchema } from "./enums/colorSchema";
+import LottieView from 'lottie-react-native';
+import Loader from './components/Loader';
 
 export default function App() {
-  const { width, height } = useWindowDimensions()
+  const [offset, setOffset] = useState<number>(0);
+  const [pokeData, setPokeData] = useState<any[]>([]);
+  const [isLoadign, setIsloadig] = useState<boolean>(true);
+  useEffect(() => {
+    setIsloadig(true)
+    fetch(`https://pokeapi.co/api/v2/pokemon/?limit=50&offset=${offset}`, {
+      method: 'GET'
+    }).then((response) => response.json())
+      .then((json) => {
+        const res = json.results;
+        setPokeData(old => [...old, ...res])
+        setIsloadig(false)
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, [offset]);
+  const handleData = () => {
+    setOffset(offset + 50)
+  }
   return (
     <>
-      <Canvas style={{ width, height, position: 'absolute' }}>
-        <Fill color={colorSchema.main} />
-        <Box box={rrect(rect(width / 2 - 64, 64, 128, 128), 24, 24)} color={colorSchema.main}>
-          <BoxShadow dx={10} dy={10} blur={10} color={colorSchema.lShadow} inner />
-          <BoxShadow dx={-10} dy={-10} blur={10} color={colorSchema.dShadow} inner />
-          <BoxShadow dx={10} dy={10} blur={10} color={colorSchema.lShadow} />
-          <BoxShadow dx={-10} dy={-10} blur={10} color={colorSchema.dShadow} />
+      <NativeBaseProvider>
+        <Box p={10}>
+          <Heading fontSize="xl" p="1" pb="10">
+            Inbox
+          </Heading>
+          <FlatList data={pokeData} renderItem={({
+            item
+          }) => <Box borderBottomWidth="5" _dark={{
+            borderColor: "muted.50"
+          }} borderColor="muted.800" pl={["0", "4"]} pr={["0", "5"]} py="2">
+              <HStack space={[2, 3]} justifyContent="space-between">
+                <VStack>
+                  <Text _dark={{
+                    color: "warmGray.50"
+                  }} color="coolGray.800" bold>
+                    {item.name}
+                  </Text>
+                  <Text color="coolGray.600" _dark={{
+                    color: "warmGray.200"
+                  }}>
+                    {item.url}
+                  </Text>
+                </VStack>
+                <Spacer />
+              </HStack>
+            </Box>} keyExtractor={item => item.id} marginBottom="30" onEndReachedThreshold={0} onEndReached={handleData}
+            initialScrollIndex={0}
+            onScrollToIndexFailed={({ index }) => { console.log(index) }}
+          />
         </Box>
-        <Box box={rrect(rect(width / 2 - 64, height / 2 - 64, 128, 128), 100, 100)} color={colorSchema.main}>
-          <BoxShadow dx={10} dy={10} blur={10} color={colorSchema.lShadow} inner />
-          <BoxShadow dx={-10} dy={-10} blur={10} color={colorSchema.dShadow} inner />
-          <BoxShadow dx={10} dy={10} blur={10} color={colorSchema.lShadow} />
-          <BoxShadow dx={-10} dy={-10} blur={10} color={colorSchema.dShadow} />
-        </Box>
-      </Canvas>
+      </NativeBaseProvider>
     </>
   );
 }
