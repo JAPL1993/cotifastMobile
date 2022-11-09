@@ -28,36 +28,41 @@ export default function App() {
   }
   return (
     <>
-      <NativeBaseProvider>
-        <Box p={10}>
-          <Heading fontSize="xl" p="1" pb="10">
-            Inbox
-          </Heading>
-          <FlatList data={pokeData} renderItem={({
-            item
-          }) => <Box borderBottomWidth="5" _dark={{
-            borderColor: "muted.50"
-          }} borderColor="muted.800" pl={["0", "4"]} pr={["0", "5"]} py="2">
-              <HStack space={[2, 3]} justifyContent="space-between">
-                <VStack>
-                  <Text _dark={{
-                    color: "warmGray.50"
-                  }} color="coolGray.800" bold>
-                    {item.name}
-                  </Text>
-                  <Text color="coolGray.600" _dark={{
-                    color: "warmGray.200"
-                  }}>
-                    {item.url}
-                  </Text>
-                </VStack>
-                <Spacer />
-              </HStack>
-            </Box>} keyExtractor={item => item.id} marginBottom="30" onEndReachedThreshold={0} onEndReached={handleData}
-            initialScrollIndex={0}
-            onScrollToIndexFailed={({ index }) => { console.log(index) }}
-          />
-        </Box>
+      <NativeBaseProvider >
+        {
+          isLoadign
+            ? <Loader></Loader>
+            : <Box p={10}>
+              <Heading fontSize="xl" p="1" pb="10">
+                Inbox
+              </Heading>
+              <FlatList initialScrollIndex={offset} data={pokeData} renderItem={({
+                item
+              }) => <Box borderBottomWidth="5" _dark={{
+                borderColor: "muted.50"
+              }} borderColor="muted.800" pl={["0", "4"]} pr={["0", "5"]} py="2">
+                  <HStack space={[2, 3]} justifyContent="space-between">
+                    <VStack>
+                      <Text _dark={{
+                        color: "warmGray.50"
+                      }} color="coolGray.800" bold>
+                        {item.name}
+                      </Text>
+                      <Text color="coolGray.600" _dark={{
+                        color: "warmGray.200"
+                      }}>
+                        {item.url}
+                      </Text>
+                    </VStack>
+                    <Spacer />
+                  </HStack>
+                </Box>} keyExtractor={item => item.id} marginBottom="30" onEndReachedThreshold={0} onEndReached={handleData}
+
+                onScrollToIndexFailed={({ index }) => { console.log(index) }}
+
+              />
+            </Box>
+        }
       </NativeBaseProvider>
     </>
   );
