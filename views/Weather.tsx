@@ -7,6 +7,7 @@ import { Box, Text, FlatList, Heading, HStack, VStack, Spacer, AspectRatio, Imag
 export default () => {
     const [location, setLocation] = useState<any>();
     const [errorMsg, setErrorMsg] = useState<string>();
+    const [weather, setWeather] = useState<any>()
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -19,18 +20,18 @@ export default () => {
             dispatch(setLoading(true))
             let location = await Location.getCurrentPositionAsync({});
             setLocation(location);
-            fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}&appid=0dce50c0d3b80ebc23cbfd3e53fcb173`, {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?units=metric&lang=es&lat=${location.coords.latitude}&lon=${location.coords.longitude}&appid=0dce50c0d3b80ebc23cbfd3e53fcb173`, {
                 method: 'GET'
             })
                 .then((response) => response.json())
                 .then((json) => {
-                    console.log(json)
+                    setWeather(json);
                 })
                 .catch((e) => console.log(e.msg))
             dispatch(setLoading(false))
         })();
     }, []);
     return (
-        <Text>El coso</Text>
+        <Text>{JSON.stringify(weather)}</Text>
     );
 }
